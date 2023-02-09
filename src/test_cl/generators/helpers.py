@@ -38,7 +38,14 @@ class TemplatedFileGenerator:
             name=name,
         )
 
-    def write(self, output_file: "t.SourceFile", data: tg.Any):
+    def write(
+            self,
+            output_file: "t.SourceFile",
+            data: tg.Any,
+            *,
+            end_with_newline: bool = True,
+    ) -> None:
+        """ writes the rendered template result to a file """
         template_result = self._template.render(
             run={
                 'now': datetime.now(),
@@ -46,7 +53,7 @@ class TemplatedFileGenerator:
                 # TODO add the lib version number as well
             },
             data=data,
-        )
+        ) + "\n" if end_with_newline else ""
         output_file.path.parent.mkdir(parents=True, exist_ok=True)
         if not output_file.path.exists():
             with open(output_file.path, 'w+') as file:
