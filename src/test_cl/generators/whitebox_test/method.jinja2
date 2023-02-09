@@ -1,0 +1,44 @@
+import pytest
+from pytest_mock import MockFixture
+
+
+# @pytest.mark.parametrize("param_value, expectation", [
+#     (0, 0),
+#     (1, 1),
+#     (2, 2),
+# ])
+def test_happy_scenario(mocker: "MockFixture"):
+    pytest.fail("test is not implemented yet")
+
+    import {{ data.source_file.identifier }} as module
+    fake = mocker.Mock(**{
+        # mocks go here
+    })
+
+    result = module.{{ data.class_def.identifier }}.{{ data.function_def.identifier }}({%
+    for argument in data.function_def.arguments %}
+        {%
+        if argument.identifier == 'self'
+        %}fake.instance,{%
+        elif not argument.identifier %}{%
+        else
+        %}{{ argument.identifier }}=fake.{{ argument.identifier }},{%
+        endif
+%}{% endfor %}
+    )
+
+    # or maybe
+
+    instance = module.{{ data.class_def.identifier }}.__new__()
+    # perform manual initialization of `instance`
+    result = instance.{{ data.function_def.identifier }}({%
+        for argument in data.function_def.arguments
+        %}{%
+        if argument.identifier and argument.identifier != 'self'
+        %}
+        {{ argument.identifier }}=fake.{{ argument.identifier }},{%
+        endif
+    %}{% endfor %}
+    )
+
+    assert result == "expectation"

@@ -1,0 +1,37 @@
+""" contract functionality for all code generators """
+#   Copyright 2023 RoaldO
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+import abc
+from pathlib import Path
+
+
+class TestGenerator(abc.ABC):
+    """ contract class for the code generators """
+
+    def __init__(self, *, project_root: "Path"):
+        """
+        template initializer method that code generators need to implement.
+        :param project_root: Root of the project where the generator runs.
+        """
+
+    @abc.abstractmethod
+    def run(self, source_file: "t.SourceFile") -> None:
+        """
+        template method that code generators need to implement.
+        :param source_file: the file for which the code generator has to perform
+                            its operations
+        :return: Nothing
+        """
+        raise NotImplementedError()

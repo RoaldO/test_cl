@@ -26,6 +26,8 @@ The test_cl commands need to be run from the applications root folder.
 python -m test_cl generate
 ```
 
+optionally, you can specify a project if the project you run it for is not in the current working directory.
+
 Contributing
 ------------
 In this phase I do not yet accept contributions, but hopefully soon will. If you really need to have certain changes, 
