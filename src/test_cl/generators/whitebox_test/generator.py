@@ -32,45 +32,44 @@ class WhiteboxTestGenerator(interface.TestGenerator):
 
     def run(self, source_file: "t.SourceFile") -> None:
         if self.is_applicable(source_file):
-            # FIXME de gegenereerde bestandsnamen kloppen nog niet
-            source_root = source_file.project_root / "tests"
-
-            mod_parent, _, mod_self = source_file.identifier.rpartition(".")
-            module = t.Module(f"whitebox.{mod_parent}.test_{mod_self}")
-            rel_path = "/".join(module.split("."))
+            source_root = self._get_tests_root(source_file.project_root)
+            module = self._get_test_file_module(source_file)
+            test_package_base = source_root / "/".join(module.split("."))
 
             ast_wrapper = AstWrapper(source_file)
+            package_generator = PackagesGenerator(project_root=source_file.project_root)
 
             for class_def in ast_wrapper.iter_classes():
-                for function_def in ast_wrapper.iter_functions(class_def.ast_node):
+                test_source_package = test_package_base / class_def.identifier
+                package_generator.run(
+                    source_file=t.SourceFile(
+                        project_root=source_file.project_root,
+                        source_root=source_root,
+                        path=test_source_package
+                    ),
+                )
+                self._generate_method_tests(
+                    ast_wrapper=ast_wrapper,
+                    class_def=class_def,
+                    source_file=source_file,
+                    source_root=source_root,
+                    test_source_package=test_source_package,
+                )
 
-                    test_source_path = source_root / \
-                                       rel_path / \
-                                       class_def.identifier / \
-                                       f"test_{function_def.identifier}.py"
-
-                    PackagesGenerator(
-                        project_root=source_file.project_root
-                    ).run(
-                        source_file=t.SourceFile(
-                            project_root=source_file.project_root,
-                            source_root=source_root,
-                            path=test_source_path.parent
-                        ),
-                    )
-
-                    self._method_template.write(
-                        t.SourceFile(
-                            project_root=source_file.project_root,
-                            source_root=source_root,
-                            path=test_source_path
-                        ),
-                        data={
-                            "source_file": source_file,
-                            "class_def": class_def,
-                            "function_def": function_def,
-                        },
-                    )
+    def _generate_method_tests(self, ast_wrapper, class_def, source_file, source_root, test_source_package):
+        for function_def in ast_wrapper.iter_functions(class_def.ast_node):
+            self._method_template.write(
+                t.SourceFile(
+                    project_root=source_file.project_root,
+                    source_root=source_root,
+                    path=test_source_package / f"test_{function_def.identifier}.py"
+                ),
+                data={
+                    "source_file": source_file,
+                    "class_def": class_def,
+                    "function_def": function_def,
+                },
+            )
 
     @staticmethod
     def is_applicable(source_file: "t.SourceFile") -> bool:
@@ -83,3 +82,12 @@ class WhiteboxTestGenerator(interface.TestGenerator):
             source_file.path.suffix == '.py',
             not str(source_file.path).endswith("/__main__.py"),
         ))
+
+    @staticmethod
+    def _get_tests_root(project_root: "Path") -> "Path":
+        return project_root / "tests"
+
+    @staticmethod
+    def _get_test_file_module(source_file: "t.SourceFile") -> "t.Module":
+        mod_parent, _, mod_self = source_file.identifier.rpartition(".")
+        return t.Module(f"whitebox.{mod_parent}.test_{mod_self}")

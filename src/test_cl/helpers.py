@@ -32,8 +32,10 @@ class AstWrapper:
         self.source_file = source_file
 
     def iter_classes(self, node: "ASTNode" = None):
-        source_text = self.source_file.path.read_text()
-        node = node or ast.parse(source_text, filename=self.source_file.path)
+        # TODO add support for nested classes
+        if not node:
+            source_text = self.source_file.path.read_text()
+            node = ast.parse(source_text, filename=str(self.source_file.path))
         for child_node in ast.iter_child_nodes(node):
             match child_node:
                 case ast.ClassDef():
@@ -45,7 +47,7 @@ class AstWrapper:
 
     def iter_functions(self, node: "ASTNode" = None):
         source_text = self.source_file.path.read_text()
-        node = node or ast.parse(source_text, filename=self.source_file.path)
+        node = node or ast.parse(source_text, filename=str(self.source_file.path))
         for child_node in ast.iter_child_nodes(node):
             match child_node:
                 case ast.FunctionDef():

@@ -12,7 +12,7 @@ def test_happy_scenario(mocker: "MockFixture"):
 
     import {{ data.source_file.identifier }} as module
     fake = mocker.Mock(**{
-        "instance": mocker.Mock(spec={{ data.class_def.identifier }}, **{
+        "instance": mocker.Mock(spec=module.{{ data.class_def.identifier }}, **{
             # class / instance members are faked here
         })
         # other fakes go here

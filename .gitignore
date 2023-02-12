@@ -3,3 +3,9 @@
 .idea/
 
 *.pyc
+
+.coverage
+/htmlcov/
+/allure/
+
+allure-report/

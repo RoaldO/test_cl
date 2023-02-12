@@ -39,6 +39,7 @@ environment.
 
 ### Automated tests
 The library uses [pytest](https://docs.pytest.org/) to test its own implementation.
+It uses allure for easier test result insight. Install it as described [here](https://docs.qameta.io/allure-report/)
 
 ### IDE setup
 #### JetBrains IDEs
